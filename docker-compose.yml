@@ -1,0 +1,31 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  telegram-bot:
+    build: .
+    container_name: lunch-order-bot
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - DEFAULT_LIMIT=${DEFAULT_LIMIT:-400}
+      - REPORT_HOUR=${REPORT_HOUR:-13}
+      - REPORT_MINUTE=${REPORT_MINUTE:-0}
+      - ORDER_DEADLINE_HOUR=${ORDER_DEADLINE_HOUR:-19}
+      - TZ=${TZ:-Europe/Moscow}
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f python || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  data:
+  logs:
